@@ -21,16 +21,44 @@
       h1 > strong {
         @apply !font-semibold relative inline-block before:block before:absolute before:-inset-1 before:-skew-y-3 before:-z-10 before:bg-blue-500;
       }
+
+      pre.highlight {
+        @apply p-4 text-xs;
+      }
+
+      .footnote {
+        @apply p-1;
+      }
+      .footnotes {
+        @apply border-t border-slate-500/50 text-sm text-slate-500;
+      }
+      .footnotes > ol {
+        @apply p-0 marker:text-sm marker:text-slate-500;
+      }
+      .footnotes > ol > li {
+        @apply p-0;
+      }
+
+      .task-list {
+        @apply p-0 list-none;
+      }
+      .task-list-item {
+        @apply p-0 m-0;
+      }
+      .task-list-item-checkbox {
+        @apply m-2 ml-0 align-[-10px] rounded-full border-none text-rose-500 bg-slate-500/50;
+      }
     }
   </style>
 </head>
 
 <body class="subpixel-antialiased bg-slate-50 dark:bg-slate-900">
 
-  <div class="m-auto p-8 pt-12 pb-24 leading-lose prose prose-img:rounded-md prose-a:no-underline prose-a:text-blue-500 hover:prose-a:text-blue-600 prose-blockquote:[quotes:none] dark:prose-invert">
+  <div
+    class="m-auto p-8 pt-12 pb-24 leading-lose prose prose-img:rounded-md prose-a:no-underline prose-a:text-blue-500 hover:prose-a:text-blue-600 prose-blockquote:[quotes:none] dark:prose-invert">
     {{content}}
   </div>
-  
+
 </body>
 
 <html>

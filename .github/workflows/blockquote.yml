@@ -1,15 +1,12 @@
-name: Onega
+name: Blockquote
 
 on:
   push:
-    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
   prose:
     runs-on: ubuntu-latest
     steps:
-      - name: block
-        run: echo "Мой дядя самых честных правил.."
-      - name: quote
-        run: echo "Его подставили."
+      - name: blockquote
+        run: echo "Мой дядя самых честных правил."
