@@ -12,6 +12,7 @@ group :jekyll_plugins do
     gem "jekyll-optional-front-matter"
     gem "jekyll-paginate"
     gem "jekyll-readme-index"
+    gem "jekyll-remote-theme"
     gem "jekyll-titles-from-headings"
     gem "jekyll-relative-links"
 end
