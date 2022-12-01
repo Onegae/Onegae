@@ -23,7 +23,7 @@
 - [ ] Коллективная болтовня с Евгением Онегиным
 - [x] Ключи от квартиры «где деньги лежат» и/или PGP-подписей
 - [ ] Обмолвиться с Анной Романовой о царских ароматах той поры
-- [x] Написать прозу на HTML5 и JavaScript
+- [ ] Написать прозу на HTML5 и JavaScript
 
 Цифровизация
 ------------
@@ -49,3 +49,14 @@
 - [ ] Встреча с Анной Карениной
 - [ ] Встреча с Анастрасией Романовой
 - [x] Встреча с Кириллом и/или Мефодием
+
+Реализация
+----------
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2" crossorigin></script>
+    <script>
+      const client = supabase.createClient(
+        'https://iqpokkogrxcidfvvouaz.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxcG9ra29ncnhjaWRmdnZvdWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk1NjUyMDksImV4cCI6MTk4NTE0MTIwOX0.CqEo93msN9MeaCFrCVFtO8AorACl7Cm1rk3rTaGUgbA'
+      )
+    </script>
