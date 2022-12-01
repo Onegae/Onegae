@@ -1,0 +1,12 @@
+{% for package in site.unpkg %}
+<script src="{{ package }}" crossorigin></script>
+{% endfor %}
+{% for package in page.unpkg %}
+<script src="{{ package }}" crossorigin></script>
+{% endfor %}
+<script>
+  {{ site.js }}
+</script>
+<script>
+  {{ page.js }}
+</script>

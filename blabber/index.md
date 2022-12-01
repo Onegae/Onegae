@@ -1,5 +1,30 @@
+---
+unpkg:
+  - https://unpkg.com/@supabase/supabase-js@2
+js: |
+  const client = supabase.createClient('https://iqpokkogrxcidfvvouaz.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxcG9ra29ncnhjaWRmdnZvdWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk1NjUyMDksImV4cCI6MTk4NTE0MTIwOX0.CqEo93msN9MeaCFrCVFtO8AorACl7Cm1rk3rTaGUgbA')
+---
+
 Болтовня
 ========
+
+Документация
+------------
+
+Распаковка библиотек в/на файле `_config.yml`:
+
+    unpkg:
+      - https://unpkg.com/@supabase/supabase-js@2
+    js: console.log(supabase)
+
+И на странице, если это ~~имеет значение~~ Front Matter:
+
+    ---
+    unpkg:
+      - https://unpkg.com/@supabase/supabase-js@2
+    js: console.log(supabase)
+    ---
 
 Инициализация
 -------------
