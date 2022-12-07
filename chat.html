@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="">
+<html className="">
 
 <head>
   <title>Чат с Евгением</title>
@@ -14,8 +14,8 @@
     }
   </script>
   <script src="https://unpkg.com/babel-standalone@6/babel.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/moment@2/min/moment.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-copy-to-clipboard@5/build/react-copy-to-clipboard.min.js"></script>
   <script src="https://unpkg.com/marked@4/lib/marked.umd.js"></script>
@@ -23,7 +23,7 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2" crossorigin></script>
 </head>
 
-<body class="subpixel-antialiased bg-slate-50 dark:bg-slate-900">
+<body className="subpixel-antialiased bg-slate-50 dark:bg-slate-900">
 
   <div id="chat"></div>
 
@@ -41,7 +41,7 @@
 
       const fetchUsers = async (setState, setLoading) => {
         const { data, error } = await client.from('users')
-          .select('id, name, content, avatar_url, ts')
+          .select('id, name, bio, avatar_url, ts')
           .order('ts', { ascending: false })
 
         if (setLoading) {
@@ -80,7 +80,7 @@
       const [users, setUsers] = React.useState([])
 
       React.useEffect(() => {
-        
+
         subscribeUsers(
           (user) => setUsers(
             (users) => [user, ...users]
@@ -100,16 +100,16 @@
       }, [])
 
       if (loading) return <div className="flex-1 overflow-auto overflow-x-hidden p-4 pt-12 pb-24 text-center">
-        <div class="animate-pulse">
+        <div className="animate-pulse">
           <div className="relative cursor-default inline-block w-24 h-8 m-2 p-1 px-3 rounded-full bg-slate-300/20 dark:bg-slate-700/20">
-            <span class="absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300/20 rounded-full"></span>
+            <span className="absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300/20 rounded-full"></span>
           </div>
           <div className="relative cursor-default inline-block w-36 h-8 m-2 p-1 px-3 rounded-full bg-slate-300/20 dark:bg-slate-700/20"></div>
           <div className="relative cursor-default inline-block w-40 h-8 m-2 p-1 px-3 rounded-full bg-slate-300/20 dark:bg-slate-700/20">
-            <span class="absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300/20 rounded-full"></span>
+            <span className="absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300/20 rounded-full"></span>
           </div>
           <div className="relative cursor-default inline-block w-28 h-8 m-2 p-1 px-3 rounded-full bg-slate-300/20 dark:bg-slate-700/20">
-            <span class="absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300/20 rounded-full"></span>
+            <span className="absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300/20 rounded-full"></span>
           </div>
           <div className="relative cursor-default block w-32 h-8 m-4 mx-auto p-1 px-3 rounded-full bg-gradient-to-r from-red-200/30 via-red-300/30 to-yellow-200/30"></div>
         </div>
@@ -122,14 +122,14 @@
       return <ul className="flex-1 overflow-auto overflow-x-hidden p-4 pt-12 pb-24 text-center">
         <li className="w-max mx-auto m-4 p-0.5 px-1.5 text-slate-500">На связи:</li>
         {users.map((user) =>
-          user.id === supreme
+          user.id === null //TODO room.priest.id
             ? <li key={user.id} className="relative cursor-default block w-max m-4 mx-auto p-1 px-3 rounded-full font-medium bg-gradient-to-r from-red-200 via-red-300 to-yellow-200">
               {user.name}
-              <span class="!hidden absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300 rounded-full"></span>
+              <span className="!hidden absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300 rounded-full"></span>
             </li>
             : <li key={user.id} className="relative cursor-default inline-block w-max m-2 p-1 px-3 rounded-full bg-slate-300 dark:bg-slate-700 dark:text-white">
               {user.name}
-              <span class="!hidden absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300 rounded-full"></span>
+              <span className="!hidden absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300 rounded-full"></span>
             </li>
         )}
         <li className="w-max mx-auto m-4 p-0.5 px-1.5 text-slate-500">..ты с нами?</li>
@@ -257,7 +257,7 @@
 
         const src = 'https://www.youtube.com/embed/' + content.match(embedMessage).at(group)
 
-        return <div class="aspect-w-16 aspect-h-9">
+        return <div className="aspect-w-16 aspect-h-9">
           <iframe src={src} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
       }
@@ -355,11 +355,11 @@
       }
 
       const renderUser = (message, room) => {
-        return message.user.id === room.id
+        return message.user.id === room.priest.id
           ? <div className="absolute bottom-3 left-3 cursor-default w-max text-xs p-0.5 px-1.5 -mx-1 rounded-full font-medium text-slate-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200">{message.user.name}</div>
           : <div className="absolute bottom-3 left-3 cursor-default w-max text-xs p-0.5 px-1.5 -mx-1 rounded-full font-normal text-slate-900 bg-slate-300 dark:bg-slate-700 dark:text-white">
             {message.user.name}
-            <span class="!hidden absolute -right-0.5 -bottom-0.5 w-2 h-2 bg-emerald-300 rounded-full"></span>
+            <span className="!hidden absolute -right-0.5 -bottom-0.5 w-2 h-2 bg-emerald-300 rounded-full"></span>
           </div>
       }
 
@@ -368,13 +368,13 @@
       }
 
       if (loading) return <div className="flex flex-col-reverse flex-1 overflow-hidden p-4 pt-12 pb-24">
-        <div class="animate-pulse">
-          <div class="bg-slate-200/20 rounded-lg w-32 h-10 mb-8 clear-both"></div>
-          <div class="bg-blue-600/20 rounded-lg w-32 h-10 mb-8 clear-both float-right"></div>
-          <div class="bg-slate-200/20 rounded-lg w-48 h-10 mb-8 clear-both"></div>
-          <div class="bg-slate-200/20 rounded-lg w-64 h-10 mb-8 clear-both"></div>
-          <div class="bg-slate-200/20 rounded-lg w-48 h-20 mb-8 clear-both"></div>
-          <div class="bg-blue-600/20 rounded-lg w-48 h-10 mb-8 clear-both float-right"></div>
+        <div className="animate-pulse">
+          <div className="bg-slate-200/20 rounded-lg w-32 h-10 mb-8 clear-both"></div>
+          <div className="bg-blue-600/20 rounded-lg w-32 h-10 mb-8 clear-both float-right"></div>
+          <div className="bg-slate-200/20 rounded-lg w-48 h-10 mb-8 clear-both"></div>
+          <div className="bg-slate-200/20 rounded-lg w-64 h-10 mb-8 clear-both"></div>
+          <div className="bg-slate-200/20 rounded-lg w-48 h-20 mb-8 clear-both"></div>
+          <div className="bg-blue-600/20 rounded-lg w-48 h-10 mb-8 clear-both float-right"></div>
         </div>
       </div>
 
@@ -394,7 +394,7 @@
               <CopyToClipboard text={message.content}>
                 <div className={buildClasses(message, uuid)}>{renderMessage(message)}</div>
               </CopyToClipboard>
-              {renderUser(message, supreme)}
+              {renderUser(message, null)}
               {renderTime(message)}
               <div className="flex-1"></div>
             </li>
@@ -565,7 +565,7 @@
 
     function SignOut({ theme, setTheme, mode, setMode, signOut }) {
 
-      return <div class="absolute z-10 top-0 left-0 right-0 p-2 text-center">
+      return <div className="absolute z-10 top-0 left-0 right-0 p-2 text-center">
         <button
           className="p-2 mx-2 rounded-full text-sm text-black/50 hover:text-black/80 dark:text-white/50 dark:hover:text-white/80 backdrop-blur-sm bg-slate-300/50 dark:bg-slate-700/50"
           onClick={() => setMode(mode === 'silent' ? 'notifications' : 'silent')}>
@@ -606,7 +606,7 @@
 
       const fetchRoom = async (id, setState, setLoading) => {
         const { data, error } = await client.from('rooms')
-          .select('id, name, content, user:user_id(id, name, content, avatar_url), ts')
+          .select('id, name, description, priest:priest(id, name, bio, avatar_url), ts')
           .eq('id', id)
           .single()
 
@@ -648,18 +648,18 @@
       }, [])
 
       if (loading) {
-        return <div class="w-full m-auto p-8 bg-blue-600">
-          <div class="animate-pulse">
-            <div class="bg-slate-200/20 rounded-lg w-full h-10 mb-8"></div>
-            <div class="bg-slate-200/20 rounded-lg w-full h-7  mb-3"></div>
-            <div class="bg-slate-200/20 rounded-lg w-full h-7  mb-3"></div>
-            <div class="bg-slate-200/20 rounded-lg w-48   h-7  mb-3"></div>
-            <div class="bg-slate-200/20 rounded-lg w-full h-7  mt-8"></div>
+        return <div className="w-full m-auto p-8 bg-blue-600">
+          <div className="animate-pulse">
+            <div className="bg-slate-200/20 rounded-lg w-full h-10 mb-8"></div>
+            <div className="bg-slate-200/20 rounded-lg w-full h-7  mb-3"></div>
+            <div className="bg-slate-200/20 rounded-lg w-full h-7  mb-3"></div>
+            <div className="bg-slate-200/20 rounded-lg w-48   h-7  mb-3"></div>
+            <div className="bg-slate-200/20 rounded-lg w-full h-7  mt-8"></div>
           </div>
         </div>
       }
 
-      return <div class="w-full m-auto p-8 bg-blue-600 prose prose-invert prose-img:rounded-md prose-a:no-underline prose-blockquote:[quotes:none]">
+      return <div className="w-full m-auto p-8 bg-blue-600 prose prose-invert prose-img:rounded-md prose-a:no-underline prose-blockquote:[quotes:none]">
         {renderRoom(room)}
         {renderMeta(room)}
       </div>
@@ -671,10 +671,6 @@
       const [uuid, setUuid] = React.useState(
         localStorage.getItem('uuid')
       )
-
-      // const [supreme, setSupreme] = React.useState(
-      //   localStorage.getItem('supreme')
-      // )
 
       const [theme, setTheme] = React.useState(
         localStorage.getItem('theme')
@@ -692,7 +688,7 @@
           localStorage.clear()
         }
 
-        signIn(uuid)
+        //TODO: signIn(uuid)
 
         if (theme) {
           localStorage.setItem('theme', theme)
@@ -702,39 +698,10 @@
 
         document.documentElement.className = theme
 
-        // if (supreme) {
-        //   localStorage.setItem('supreme', supreme)
-        // } else {
-        //   localStorage.removeItem('supreme')
-        // }
-        //fetchSupreme((supreme) => setSupreme(supreme))
-
       }, [uuid, theme])
 
-      // const fetchSupreme = async (setState) => {
-
-      //   const { data, error } = await client.from('users')
-      //     .select()
-      //     .order('ts')
-      //     .limit(1)
-      //     .single()
-
-      //   const supreme = user ? user.id : null
-
-      //   if (setLoading) {
-      //     setLoading(false)
-      //   }
-
-      //   if (error) {
-      //     return data
-      //   }
-
-      //   if (setState) {
-      //     setState(data)
-      //   }
-      // }
-
       const signIn = async (uuid) => {
+
         const { data, error } = await client.from('users')
           .select()
           .eq('id', uuid)
@@ -768,6 +735,9 @@
         setUuid(null)
       }
 
+      return <Container>
+        </Container>
+
       return uuid
         ? <Container>
           <Room id={room} />
@@ -777,6 +747,7 @@
           <Submit room={room} uuid={uuid} />
         </Container>
         : <Container>
+          <Room id={room} />
           <Users />
           <SignUp signUp={signUp} />
         </Container>

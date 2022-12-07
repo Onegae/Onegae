@@ -26,9 +26,10 @@ values
   ),
   (
     'f5043712-712b-40b5-8a34-08b621a68c0f',
-    'Татьяна'
-  ),
-  on conflict on constraint users_pkey do nothing;
+    'Татьяна',
+    null,
+    null
+  ) on conflict on constraint users_pkey do nothing;
 
 --
 -- Rooms
@@ -55,8 +56,7 @@ values
     'Евгений Онегин',
     'Вымышленный персонаж. Татьяне написал.',
     '29ffbaf6-200e-4383-a024-23b795afee3b'
-  ),
-  on conflict on constraint rooms_pkey do nothing;
+  ) on conflict on constraint rooms_pkey do nothing;
 
 --
 -- Messages
@@ -113,9 +113,7 @@ values
     '2f47c09b-57f5-4494-adfa-2bec0aa391a6',
     'f5043712-712b-40b5-8a34-08b621a68c0f',
     'Давай просто останемся друзьями)'
-  );
-
-on conflict on constraint messages_pkey do nothing;
+  ) on conflict on constraint messages_pkey do nothing;
 
 --
 -- Storage

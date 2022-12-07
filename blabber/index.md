@@ -105,6 +105,14 @@ const {
   messages
 } = useChat(service)
 
-const { mode, notifications, uuid, offline, inactive } = useState()
+const { mode, notifications, uuid, offline, inactive } = useState(storage)
 
 lastMessageTimestamp = 
+
+service: Supabase|WebRTC = {
+  fetchRoom,
+  updateRoom,
+  fetchUsers, auth: {signIn, signUp, updateProfile},
+  fetchMessages, submitMessage, updateMessage, deleteMessage,
+  broadcast|channel|subscrpition
+}
