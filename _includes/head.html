@@ -4,9 +4,13 @@
 {% for package in page.unpkg %}
 <script src="{{ package }}" crossorigin></script>
 {% endfor %}
+{% if site.js %}
 <script>
   {{ site.js }}
 </script>
+{% endif %}
+{% if page.js %}
 <script>
   {{ page.js }}
 </script>
+{% endif %}

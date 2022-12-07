@@ -85,3 +85,26 @@ js: |
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxcG9ra29ncnhjaWRmdnZvdWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk1NjUyMDksImV4cCI6MTk4NTE0MTIwOX0.CqEo93msN9MeaCFrCVFtO8AorACl7Cm1rk3rTaGUgbA'
       )
     </script>
+
+Реструктуризация
+----------------
+
+Компоненты:
+
+- Сообщения
+- Набор и отправка
+- Сервисная строка (набор, скопировано, отправка)
+- Комната (информация)
+- Панель (настройки, информация)
+- Авторы
+
+
+const {
+  room,
+  users,
+  messages
+} = useChat(service)
+
+const { mode, notifications, uuid, offline, inactive } = useState()
+
+lastMessageTimestamp = 
