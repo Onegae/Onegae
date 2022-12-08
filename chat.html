@@ -1,5 +1,5 @@
 <!doctype html>
-<html className="">
+<html class="dark">
 
 <head>
   <title>Чат с Евгением</title>
@@ -21,11 +21,11 @@
   <script src="https://unpkg.com/marked@4/lib/marked.umd.js"></script>
   <script src="https://unpkg.com/html-react-parser@latest/dist/html-react-parser.min.js"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2" crossorigin></script>
-  <script type="text/javascript" src="https://vk.com/js/api/openapi.js?169"></script>
+  <script src="https://vk.com/js/api/openapi.js?169"></script>
   <script type="text/javascript">
       (function () {
-        VK.Widgets.Post("vk_post_764413358_39", 764413358, 39, 'VNM6ngI075JRR6CLjRPH0_BBLndH');
-      }());
+        VK.Widgets.Post("vk_post_764413358_39", 764413358, 39, 'VNM6ngI075JRR6CLjRPH0_BBLndH')
+      }())
   </script>
   <style type="text/tailwindcss">
     @layer components {
@@ -36,19 +36,19 @@
   </style>
 </head>
 
-<body className="subpixel-antialiased bg-slate-50 dark:bg-slate-900">
+<body class="subpixel-antialiased bg-slate-50 dark:bg-slate-900">
 
   <div id="chat"></div>
 
   <script type="text/babel">
 
     function Container({ children }) {
-      return <div className="flex flex-col m-auto max-w-screen-sm relative w-full h-screen">
+      return <div className="relative flex flex-col m-auto max-w-screen-sm min-h-screen w-full">
         {children}
       </div>
     }
 
-    function Users() {
+    function Users({ room, users, setUsers }) {
 
       const [loading, setLoading] = React.useState(true)
 
@@ -90,7 +90,7 @@
           .subscribe()
       }
 
-      const [users, setUsers] = React.useState([])
+      //const [users, setUsers] = React.useState([])
 
       React.useEffect(() => {
 
@@ -132,31 +132,32 @@
         <div className="w-max mx-auto m-4 p-0.5 px-1.5 text-slate-500">Никого. Да святится имя Твое.</div>
       </div>
 
-      return <ul className="flex-1 overflow-auto overflow-x-hidden p-4 pt-12 pb-24 text-center">
-        <li className="w-max mx-auto m-4 p-0.5 px-1.5 text-slate-500">На связи:</li>
+      return <div className="flex-1 overflow-auto overflow-x-hidden p-4 pt-12 pb-24 text-center">
+        <div className="w-max mx-auto m-4 p-0.5 px-1.5 text-slate-500">На связи:</div>
         {users.map((user) =>
-          user.id === null //TODO room.priest.id
-            ? <li key={user.id} className="relative cursor-default block w-max m-4 mx-auto p-1 px-3 rounded-full font-medium bg-gradient-to-r from-red-200 via-red-300 to-yellow-200">
+          room && user.id === room.priest.id
+            ? <div key={user.id} className="relative cursor-default block w-max m-4 mx-auto p-1 px-3 rounded-full font-medium bg-gradient-to-r from-red-200 via-red-300 to-yellow-200">
               {user.name}
               <span className="!hidden absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300 rounded-full"></span>
-            </li>
-            : <li key={user.id} className="relative cursor-default inline-block w-max m-2 p-1 px-3 rounded-full bg-slate-300 dark:bg-slate-700 dark:text-white">
+            </div>
+            : <div key={user.id} className="relative cursor-default inline-block w-max m-2 p-1 px-3 rounded-full bg-slate-300 dark:bg-slate-700 dark:text-white">
               {user.name}
               <span className="!hidden absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-emerald-300 rounded-full"></span>
-            </li>
+            </div>
         )}
-        <li className="w-max mx-auto m-4 p-0.5 px-1.5 text-slate-500">..ты с нами?</li>
-      </ul>
+        <div className="w-max mx-auto m-4 p-0.5 px-1.5 text-slate-500">Ты с нами?</div>
+      </div>
     }
 
-    function Messages({ room, uuid }) {
+    function Messages({ uuid, room, users, messages, setMessages }) {
 
       const [loading, setLoading] = React.useState(true)
 
-      const fetchMessages = async (room, setState, setLoading) => {
+      const fetchMessages = async (setState, setLoading) => {
+
         const { data, error } = await client.from('messages')
-          .select('id, content, user:user_id(id, name, content, avatar_url), ts')
-          .eq('room_id', room)
+          .select('id, content, user:user_id(id, name, bio, avatar_url), ts')
+          .eq('room_id', room.id)
           .order('ts', { ascending: false })
           .limit(30)
 
@@ -173,42 +174,42 @@
         }
       }
 
-      const fetchMessage = async (room, id) => {
+      const fetchMessage = async (id) => {
         const { data } = await client.from('messages')
           .select('id, content, user:user_id(id, name, content, avatar_url), ts')
-          .eq('room_id', room)
+          .eq('room_id', room.id)
           .eq('id', id)
           .single()
 
         return data
       }
 
-      const deleteMessage = async (room, id) => {
+      const deleteMessage = async (id) => {
         const { error } = await client
           .from('messages')
           .delete()
-          .eq('room_id', room)
+          .eq('room_id', room.id)
           .eq('id', id)
       }
 
-      const subscribeMessages = async (room, pushState, filterState, updateState) => {
+      const subscribeMessages = async (pushState, filterState, updateState) => {
         await client.channel('public:messages')
-          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'room_id=eq.' + room }, async ({ new: message }) => {
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'room_id=eq.' + room.id }, async ({ new: message }) => {
 
-            message = await fetchMessage(room, message.id)
+            message = await fetchMessage(message.id)
 
             if (pushState) {
               pushState(message)
             }
           })
-          .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages', filter: 'room_id=eq.' + room }, async ({ old: message }) => {
+          .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages', filter: 'room_id=eq.' + room.id }, async ({ old: message }) => {
             if (filterState) {
               filterState(message)
             }
           })
-          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: 'room_id=eq.' + room }, async ({ old: modified, new: message }) => {
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: 'room_id=eq.' + room.id }, async ({ old: modified, new: message }) => {
 
-            message = await fetchMessage(room, message.id)
+            message = await fetchMessage(message.id)
 
             if (updateState) {
               updateState(modified, message)
@@ -217,14 +218,14 @@
           .subscribe()
       }
 
-      const [messages, setMessages] = React.useState([])
+      //const [messages, setMessages] = React.useState([])
 
       React.useEffect(() => {
-        fetchMessages(room,
+        fetchMessages(
           (messages) => setMessages(messages),
           (loading) => setLoading(loading)
         )
-        subscribeMessages(room,
+        subscribeMessages(
           (message) => setMessages(
             (messages) => [message, ...messages]
           ),
@@ -359,15 +360,15 @@
         }
       }
 
-      const renderDeleteButton = (message, room) => {
-        return <button onClick={() => deleteMessage(room, message.id)} className="p-2 mb-2 text-slate-400 hover:text-slate-500">
+      const renderDeleteButton = (message) => {
+        return <button onClick={() => deleteMessage(message.id)} className="p-2 mb-2 text-slate-400 hover:text-slate-500">
           <svg className="m-auto h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
       }
 
-      const renderUser = (message, room) => {
+      const renderUser = (message) => {
         return message.user.id === room.priest.id
           ? <div className="absolute bottom-3 left-3 cursor-default w-max text-xs p-0.5 px-1.5 -mx-1 rounded-full font-medium text-slate-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200">{message.user.name}</div>
           : <div className="absolute bottom-3 left-3 cursor-default w-max text-xs p-0.5 px-1.5 -mx-1 rounded-full font-normal text-slate-900 bg-slate-300 dark:bg-slate-700 dark:text-white">
@@ -407,7 +408,7 @@
               <CopyToClipboard text={message.content}>
                 <div className={buildClasses(message, uuid)}>{renderMessage(message)}</div>
               </CopyToClipboard>
-              {renderUser(message, null)}
+              {renderUser(message)}
               {renderTime(message)}
               <div className="flex-1"></div>
             </li>
@@ -431,7 +432,7 @@
           setTimeout(callable, time)
         )
 
-        //TODO "Что-то" не таzк.
+        //TODO: "Что-то" не так.
       }
 
       React.useEffect(() => {
@@ -450,7 +451,7 @@
 
             setMessage('Кто-то нажимает на кнопки..')
 
-            //TODO "Что-то" не так.
+            //TODO: "Что-то" не так.
             setHidden(false)
             prolongate(() => setHidden(true))
           })
@@ -612,9 +613,9 @@
       </div>
     }
 
-    function Room({ id }) {
+    function Room({ id, room, setRoom }) {
 
-      const [room, setRoom] = React.useState()
+      //const [room, setRoom] = React.useState()
       const [loading, setLoading] = React.useState(true)
 
       const fetchRoom = async (id, setState, setLoading) => {
@@ -684,8 +685,14 @@
 
     }
 
-    function Chat({ client, room, children }) {
+    function Chat({ client, id, children }) {
 
+      // useChat(id)
+      const [room, setRoom] = React.useState({ id, priest: {} })
+      const [users, setUsers] = React.useState([])
+      const [messages, setMessages] = React.useState([])
+
+      // useSession
       const [uuid, setUuid] = React.useState(
         localStorage.getItem('uuid')
       )
@@ -694,9 +701,9 @@
         localStorage.getItem('theme')
       )
 
-      const [mode, setMode] = React.useState(
-        localStorage.getItem('mode')
-      )
+      // const [mode, setMode] = React.useState(
+      //   localStorage.getItem('mode')
+      // )
 
       React.useEffect(() => {
 
@@ -754,7 +761,9 @@
       }
 
       return <Container>
-        <Room id={room} />
+        <Room id={id} room={room} setRoom={setRoom} />
+        <Users room={room} users={users} setUsers={setUsers} />
+        <Messages uuid={uuid} room={room} users={users} messages={messages} setMessages={setMessages} />
       </Container>
 
       return uuid
@@ -778,7 +787,11 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxcG9ra29ncnhjaWRmdnZvdWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk1NjUyMDksImV4cCI6MTk4NTE0MTIwOX0.CqEo93msN9MeaCFrCVFtO8AorACl7Cm1rk3rTaGUgbA'
     )
 
-    const room = '2f47c09b-57f5-4494-adfa-2bec0aa391a6'
+    //const room = '2f47c09b-57f5-4494-adfa-2bec0aa391a6'
+
+    ReactDOM.createRoot(
+      document.getElementById('chat')
+    ).render(<Chat client={client} id="2f47c09b-57f5-4494-adfa-2bec0aa391a6" />)
 
     document.addEventListener('visibilitychange', () => {
 
@@ -796,10 +809,6 @@
     })
 
     document.documentElement.style.setProperty('--h-screen', `${window.innerHeight}px`)
-
-    ReactDOM.createRoot(
-      document.getElementById('chat')
-    ).render(<Chat client={client} room={room} />)
 
     if (Notification.permission !== 'denied') {
       //TODO: Notification.requestPermission()
