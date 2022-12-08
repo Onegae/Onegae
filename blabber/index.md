@@ -105,7 +105,7 @@ const {
   messages
 } = useChat(service)
 
-const { mode, notifications, uuid, offline, inactive } = useState(storage)
+const { theme, permissions = { notifications, audio, video }, handleOffline, handleOnline, serviceWorker } = useState(storage)
 
 lastMessageTimestamp = 
 
@@ -116,3 +116,5 @@ service: Supabase|WebRTC = {
   fetchMessages, submitMessage, updateMessage, deleteMessage,
   broadcast|channel|subscrpition
 }
+
+Комната объединена со списком участников + поле ввода имени. (room+users)+signUp

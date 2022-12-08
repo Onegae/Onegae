@@ -21,6 +21,19 @@
   <script src="https://unpkg.com/marked@4/lib/marked.umd.js"></script>
   <script src="https://unpkg.com/html-react-parser@latest/dist/html-react-parser.min.js"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2" crossorigin></script>
+  <script type="text/javascript" src="https://vk.com/js/api/openapi.js?169"></script>
+  <script type="text/javascript">
+      (function () {
+        VK.Widgets.Post("vk_post_764413358_39", 764413358, 39, 'VNM6ngI075JRR6CLjRPH0_BBLndH');
+      }());
+  </script>
+  <style type="text/tailwindcss">
+    @layer components {
+      div[id^="vk_post"] {
+        @apply !w-auto -mx-5;
+      }
+    }
+  </style>
 </head>
 
 <body className="subpixel-antialiased bg-slate-50 dark:bg-slate-900">
@@ -623,7 +636,12 @@
         }
       }
 
-      const renderRoom = (room, parser = marked) => HTMLReactParser(parser.parse(room.content))
+      const renderRoom = (room, parser = marked) => {
+
+        const html = parser.parse(room.description)
+
+        return HTMLReactParser(html)
+      }
 
       const renderMeta = (room) => {
         return <p>
@@ -736,7 +754,8 @@
       }
 
       return <Container>
-        </Container>
+        <Room id={room} />
+      </Container>
 
       return uuid
         ? <Container>
