@@ -13,21 +13,15 @@
       // h-screen: var(--h-screen, 100vh)
     }
   </script>
-  <script src="https://unpkg.com/babel-standalone@6/babel.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/uuid@8/dist/umd/uuidv4.min.js"></script>
-  <script src="https://unpkg.com/moment@2/min/moment.min.js" crossorigin></script>
+  <script src="https://unpkg.com/moment@2/min/moment.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-copy-to-clipboard@5/build/react-copy-to-clipboard.min.js"></script>
   <script src="https://unpkg.com/marked@4/lib/marked.umd.js"></script>
   <script src="https://unpkg.com/html-react-parser@latest/dist/html-react-parser.min.js"></script>
-  <script src="https://unpkg.com/@supabase/supabase-js@2" crossorigin></script>
-  <script src="https://vk.com/js/api/openapi.js?169"></script>
-  <script type="text/javascript">
-      (function () {
-        VK.Widgets.Post("vk_post_764413358_39", 764413358, 39, 'VNM6ngI075JRR6CLjRPH0_BBLndH')
-      }())
-  </script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2" crossorigin="anonymous"></script>
   <style type="text/tailwindcss">
     @layer components {
       div[id^="vk_post"] {
@@ -49,7 +43,7 @@
       </div>
     }
 
-    function Users({ room, users, setUsers }) {
+    function Users({ uuid, room, users, setUsers }) {
 
       const [loading, setLoading] = React.useState(true)
 
@@ -72,30 +66,27 @@
       }
 
       const subscribeUsers = async (pushState, filterState, updateState) => {
-        await client.channel('public:users')
+
+        const subscription = await client.channel('public:users')
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'users' }, ({ new: user }) => {
-            if (pushState) {
-              pushState(user)
-            }
+            pushState(user)
           })
           .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'users' }, ({ old: deleted }) => {
-            if (filterState) {
-              filterState(deleted)
-            }
+            filterState(deleted)
           })
           .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users' }, ({ old: modified, new: user }) => {
-            if (updateState) {
-              updateState(modified, user)
-            }
+            updateState(modified, user)
           })
           .subscribe()
+
+        return subscription
       }
 
       //const [users, setUsers] = React.useState([])
 
       React.useEffect(() => {
 
-        subscribeUsers(
+        const subscription = subscribeUsers(
           (user) => setUsers(
             (users) => [user, ...users]
           ),
@@ -111,6 +102,9 @@
           (users) => setUsers(users),
           (loading) => setLoading(loading)
         )
+
+        return () => subscription.unsubscribe()
+        
       }, [])
 
       if (loading) return <div className="flex-1 overflow-auto overflow-x-hidden p-4 pt-12 pb-24 text-center">
@@ -177,7 +171,7 @@
 
       const fetchMessage = async (id) => {
         const { data } = await client.from('messages')
-          .select('id, content, user_id, user:user_id(id, name, content, avatar_url), ts')
+          .select('id, content, user_id, user:user_id(id, name, bio, avatar_url), ts')
           .eq('room_id', room.id)
           .eq('id', id)
           .single()
@@ -194,27 +188,28 @@
       }
 
       const subscribeMessages = async (pushState, filterState, updateState) => {
-        await client.channel('public:messages')
+
+        const subscription = await client.channel('public:messages')
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'room_id=eq.' + room.id }, async ({ new: message }) => {
-
-            message = await fetchMessage(message.id)
-
-            if (pushState) {
-              pushState(message)
+            //TODO: Проверка насуществования сообщения или рефактор
+            if (isMine(message)) {
+              updateState(
+                message, await fetchMessage(message.id)
+              )
+            } else {
+              pushState(
+                await fetchMessage(message.id)
+              )
             }
+
           })
           .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages', filter: 'room_id=eq.' + room.id }, async ({ old: message }) => {
-            if (filterState) {
-              filterState(message)
-            }
+            filterState(message)
           })
           .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: 'room_id=eq.' + room.id }, async ({ old: modified, new: message }) => {
-
-            message = await fetchMessage(message.id)
-
-            if (updateState) {
-              updateState(modified, message)
-            }
+            updateState(
+              modified, await fetchMessage(message.id)
+            )
           })
           .subscribe()
       }
@@ -400,7 +395,7 @@
       </div>
 
       if (messages.length === 0) return <ul className="flex-1 p-4 pt-12 pb-24">
-        <li className="w-max mx-auto m-4 p-0.5 px-1.5 text-slate-500">Пока тишина. Начинай ты..</li>
+        <li className="w-max mx-auto m-4 p-0.5 px-1.5 text-slate-500">Пока тишина. Начинай ты.</li>
       </ul>
 
       return <ul className="flex flex-col-reverse flex-1 overflow-auto overflow-x-hidden p-4 pt-12 pb-24">
@@ -428,7 +423,7 @@
       const [message, setMessage] = React.useState()
       const [hidden, setHidden] = React.useState(false)
 
-      const [timeout, updateTimeout] = React.useState(false)
+      const [timeout, updateTimeout] = React.useState(0)
       const prolongate = (callable, time = 2500) => {
 
         if (timeout) {
@@ -445,33 +440,21 @@
       React.useEffect(() => {
 
         const config = {
-          config: {
-            broadcast: { ack: true, self: false },
-            presence: { key: localStorage.uuid }
-          }
+          config: { presence: { key: uuid } }
         }
 
-        const subscription = client.channel(room, config)
-          .on('broadcast', { event: 'keydown' }, (payload) => {
-
-            console.log(timeout)
-
-            setMessage('Кто-то нажимает на кнопки..')
-
-            //TODO: "Что-то" не так.
-            setHidden(false)
-            prolongate(() => setHidden(true))
+        const channel = client.channel(room.id, config)
+          .on('presence', { event: 'sync' }, (event) => {
+            console.log(channel.presenceState())
           })
-          // .on('presence', { event: 'sync' }, (event) => {
-          //   console.log('Online users: ', channel.presenceState())
-          // })
-          .subscribe()
+
+        const subscription = channel.subscribe()
 
         document.addEventListener('keydown', function (e) {
-          subscription.send({
-            type: 'broadcast',
-            event: 'keydown',
-          })
+          // subscription.send({
+          //   type: 'broadcast',
+          //   event: 'keydown',
+          // })
         })
 
         return () => subscription.unsubscribe()
@@ -795,7 +778,7 @@
 
       return <Container>
         <Room room={room} setRoom={setRoom} />
-        <Users room={room} users={users} setUsers={setUsers} />
+        <Users uuid={uuid} room={room} users={users} setUsers={setUsers} />
         <Messages uuid={uuid} room={room} users={users} messages={messages} setMessages={setMessages} />
         <Submit uuid={uuid} room={room} setMessages={setMessages} />
       </Container>
