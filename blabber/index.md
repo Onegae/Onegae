@@ -107,8 +107,6 @@ const {
 
 const { theme, permissions = { notifications, audio, video }, handleOffline, handleOnline, serviceWorker } = useState(storage)
 
-lastMessageTimestamp = 
-
 service: Supabase|WebRTC = {
   fetchRoom,
   updateRoom,
@@ -118,3 +116,5 @@ service: Supabase|WebRTC = {
 }
 
 Комната объединена со списком участников + поле ввода имени. (room+users)+signUp
+
+ref + lastMessageTimestamp

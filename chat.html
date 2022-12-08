@@ -157,7 +157,7 @@
       const fetchMessages = async (setState, setLoading) => {
 
         const { data, error } = await client.from('messages')
-          .select('id, content, user:user_id(id, name, bio, avatar_url), ts')
+          .select('id, content, user_id, user:user_id(id, name, bio, avatar_url), ts')
           .eq('room_id', room.id)
           .order('ts', { ascending: false })
           .limit(30)
@@ -364,26 +364,24 @@
       }
 
       const renderDeleteButton = (message) => {
-        return message.ts
-          ? <button onClick={() => deleteMessage(message.id)} className="p-2 mb-2 text-slate-400 hover:text-slate-500">
-            <svg className="m-auto h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-          : <button onClick={() => console.log(message.id)} className="p-2 mb-2 text-slate-400 hover:text-slate-500">
-            <svg className="animate-bounce m-auto w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l7.5-7.5 7.5 7.5m-15 6l7.5-7.5 7.5 7.5" />
-            </svg>
-          </button>
+        return <button disabled={!message.ts} onClick={() => deleteMessage(message.id)} className="p-2 mb-2 text-slate-400 hover:text-slate-500 disabled:opacity-10">
+          <svg className="m-auto h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
       }
 
       const renderUser = (message) => {
-        return message.user.id === room.priest.id
-          ? <div className="absolute bottom-3 left-3 cursor-default w-max text-xs p-0.5 px-1.5 -mx-1 rounded-full font-medium text-slate-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200">{message.user.name}</div>
-          : <div className="absolute bottom-3 left-3 cursor-default w-max text-xs p-0.5 px-1.5 -mx-1 rounded-full font-normal text-slate-900 bg-slate-300 dark:bg-slate-700 dark:text-white">
-            {message.user.name}
-            <span className="!hidden absolute -right-0.5 -bottom-0.5 w-2 h-2 bg-emerald-300 rounded-full"></span>
-          </div>
+
+        const classNames = 'absolute bottom-3 left-3 cursor-default w-max text-xs p-0.5 px-1.5 -mx-1 rounded-full font-medium text-slate-900 '
+          + (message.user.id === room.priest.id
+            ? 'bg-gradient-to-r from-red-200 via-red-300 to-yellow-200'
+            : 'bg-slate-300 dark:bg-slate-700 dark:text-white')
+
+        return <div className={classNames}>
+          {message.user.name}
+          <span className="absolute -right-0.5 -bottom-0.5 w-2 h-2 bg-emerald-300 rounded-full"></span>
+        </div>
       }
 
       const renderTime = (message) => {
@@ -489,28 +487,29 @@
     function Submit({ uuid, room, setMessages }) {
 
       const [content, setContent] = React.useState()
-      const resetForm = () => setContent(null)
+      const resetForm = () => setContent('')
 
       const submitMessage = async (pushState, filterState, updateState) => {
 
-        const message = { id: uuidv4(), content, room_id: room.id, user_id: uuid }
+        const message = { content, room_id: room.id, user_id: uuid, id: uuidv4() }
 
         if (pushState) {
           pushState(message)
         }
 
-        return
-
         const { data, error } = await client.from('messages')
           .insert(message)
+          .select()
+          .single()
 
         if (error) {
+
           switch (error.code) {
             // user_id bad value
             case '23502':
             case '23503':
-              // return signOut()
-              break;
+              // signOut()
+              console.log(error.message)
             default:
               if (filterState) {
                 filterState(message)
