@@ -104,7 +104,7 @@
         )
 
         return () => subscription.unsubscribe()
-        
+
       }, [])
 
       if (loading) return <div className="flex-1 overflow-auto overflow-x-hidden p-4 pt-12 pb-24 text-center">
@@ -423,41 +423,9 @@
       const [message, setMessage] = React.useState()
       const [hidden, setHidden] = React.useState(false)
 
-      const [timeout, updateTimeout] = React.useState(0)
-      const prolongate = (callable, time = 2500) => {
-
-        if (timeout) {
-          clearTimeout(timeout)
-        }
-
-        updateTimeout(
-          setTimeout(callable, time)
-        )
-
-        //TODO: "Что-то" не так.
-      }
-
       React.useEffect(() => {
 
-        const config = {
-          config: { presence: { key: uuid } }
-        }
-
-        const channel = client.channel(room.id, config)
-          .on('presence', { event: 'sync' }, (event) => {
-            console.log(channel.presenceState())
-          })
-
-        const subscription = channel.subscribe()
-
-        document.addEventListener('keydown', function (e) {
-          // subscription.send({
-          //   type: 'broadcast',
-          //   event: 'keydown',
-          // })
-        })
-
-        return () => subscription.unsubscribe()
+        return () => {}
 
       }, [])
 
