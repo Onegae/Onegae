@@ -177,7 +177,7 @@
 
       const fetchMessage = async (id) => {
         const { data } = await client.from('messages')
-          .select('id, content, user:user_id(id, name, content, avatar_url), ts')
+          .select('id, content, user_id, user:user_id(id, name, content, avatar_url), ts')
           .eq('room_id', room.id)
           .eq('id', id)
           .single()
