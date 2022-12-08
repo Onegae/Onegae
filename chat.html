@@ -16,6 +16,7 @@
   <script src="https://unpkg.com/babel-standalone@6/babel.min.js" crossorigin></script>
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/uuid@8/dist/umd/uuidv4.min.js"></script>
   <script src="https://unpkg.com/moment@2/min/moment.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-copy-to-clipboard@5/build/react-copy-to-clipboard.min.js"></script>
   <script src="https://unpkg.com/marked@4/lib/marked.umd.js"></script>
@@ -244,8 +245,10 @@
       const imageMessage = /^https:\/\/[^\s]+\.(jpg|jpeg|jfif|png|gif|bmp|webp)(\?[^\s]+)?$/i
       const audioMessage = /^https:\/\/[^\s]+\.(mp3|m4a|oga|wav)(\?[^\s]+)?$/i
       const videoMessage = /^https:\/\/[^\s]+\.(mp4|ogg)(\?[^\s]+)?$/i
-      const embedMessage = /^https:\/\/(www\.youtube\.com\/watch\?v=)?([^\s]+)$/i
+      const embedMessage = /^https:\/\/(www\.youtube\.com\/watch\?v=)([^\s]+)$/i
       const proseMessage = /\n\n/gmui
+
+      const isMine = (message) => message.user_id === uuid
 
       const isProseMessage = (content) => {
         return proseMessage.test(content)
@@ -272,7 +275,7 @@
         const src = 'https://www.youtube.com/embed/' + content.match(embedMessage).at(group)
 
         return <div className="aspect-w-16 aspect-h-9">
-          <iframe src={src} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <iframe src={src} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
         </div>
       }
 
@@ -292,49 +295,49 @@
         return HTMLReactParser(html)
       }
 
-      const buildClasses = (message, uuid) => {
+      const buildClasses = (message) => {
 
         const classNames = ['cursor-pointer max-w-xs md:max-w-md']
 
         switch (true) {
           case isImageMessage(message.content):
-            classNames.push('p-0', message.user.id === uuid ? 'mb-2' : 'mb-6', 'rounded-lg', 'overflow-hidden')
+            classNames.push('p-0', isMine(message) ? 'mb-2' : 'mb-6', 'rounded-lg', 'overflow-hidden')
             break
           case isVideoMessage(message.content):
-            classNames.push('p-0', message.user.id === uuid ? 'mb-2' : 'mb-6', 'bg-transparent', 'rounded-lg', 'overflow-hidden')
+            classNames.push('p-0', isMine(message) ? 'mb-2' : 'mb-6', 'bg-transparent', 'rounded-lg', 'overflow-hidden')
             break
           case isAudioMessage(message.content):
-            classNames.push('p-0', message.user.id === uuid ? 'mb-2' : 'mb-6', 'bg-transparent')
+            classNames.push('p-0', isMine(message) ? 'mb-2' : 'mb-6', 'bg-transparent')
             break
           case isEmbedMessage(message.content):
-            classNames.push('p-0', message.user.id === uuid ? 'mb-2' : 'mb-6', 'bg-slate-200 dark:bg-slate-800', 'rounded-lg', 'overflow-hidden', 'w-full')
+            classNames.push('p-0', isMine(message) ? 'mb-2' : 'mb-6', 'bg-slate-200 dark:bg-slate-800', 'rounded-lg', 'overflow-hidden', 'w-full')
             break
           case emojiMessage.test(message.content):
-            classNames.push('p-1', message.user.id === uuid ? 'mb-2' : 'mb-8', 'text-4xl')
+            classNames.push('p-1', isMine(message) ? 'mb-2' : 'mb-8', 'text-4xl')
             break
           case shortMessage.test(message.content):
-            classNames.push('p-1', message.user.id === uuid ? 'mb-2' : 'mb-8', 'text-2xl', 'font-medium', 'dark:text-white')
+            classNames.push('p-1', isMine(message) ? 'mb-2' : 'mb-8', 'text-2xl', 'font-medium', 'dark:text-white')
             break
           case debitMessage.test(message.content):
-            classNames.push('p-2', 'px-1', message.user.id === uuid ? 'mb-2' : 'mb-8', 'text-lg', 'font-mono', 'font-semibold', 'after:content-[\'💳\']', 'after:mx-2', 'dark:text-white')
+            classNames.push('p-2', 'px-1', isMine(message) ? 'mb-2' : 'mb-8', 'text-lg', 'font-mono', 'font-semibold', 'after:content-[\'💳\']', 'after:mx-2', 'dark:text-white')
             break
           default:
 
             if (isProseMessage(message.content)) {
               classNames.push('prose', 'prose-sm', 'prose-img:rounded-md', 'prose-img:m-0', 'prose-blockquote:[quotes:none]', '[&>p:last-of-type]:mb-1', 'dark:prose-invert')
 
-              if (message.user.id === uuid) {
+              if (isMine(message)) {
                 classNames.push('prose-a:text-white')
               }
             }
 
-            if (message.user.id === uuid) {
+            if (isMine(message)) {
               classNames.push('bg-blue-500', 'text-white', isProseMessage(message.content) ? 'text-left' : 'text-right')
             } else {
               classNames.push('bg-slate-200', 'dark:bg-slate-800 dark:text-white/90')
             }
 
-            classNames.push('p-2', 'px-3', message.user.id === uuid ? 'mb-2' : 'mb-6', 'rounded-lg', 'text-ellipsis overflow-hidden')
+            classNames.push('p-2', 'px-3', isMine(message) ? 'mb-2' : 'mb-6', 'rounded-lg', 'text-ellipsis overflow-hidden')
 
             break
         }
@@ -361,11 +364,17 @@
       }
 
       const renderDeleteButton = (message) => {
-        return <button onClick={() => deleteMessage(message.id)} className="p-2 mb-2 text-slate-400 hover:text-slate-500">
-          <svg className="m-auto h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
+        return message.ts
+          ? <button onClick={() => deleteMessage(message.id)} className="p-2 mb-2 text-slate-400 hover:text-slate-500">
+            <svg className="m-auto h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+          : <button onClick={() => console.log(message.id)} className="p-2 mb-2 text-slate-400 hover:text-slate-500">
+            <svg className="animate-bounce m-auto w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l7.5-7.5 7.5 7.5m-15 6l7.5-7.5 7.5 7.5" />
+            </svg>
+          </button>
       }
 
       const renderUser = (message) => {
@@ -398,10 +407,10 @@
 
       return <ul className="flex flex-col-reverse flex-1 overflow-auto overflow-x-hidden p-4 pt-12 pb-24">
         {messages.map(
-          (message) => message.user.id === uuid
+          (message) => isMine(message)
             ? <li key={message.id} className="flex flex-row-reverse">
-              <div className={buildClasses(message, uuid)}>{renderMessage(message)}</div>
-              {renderDeleteButton(message, room)}
+              <div className={buildClasses(message)}>{renderMessage(message)}</div>
+              {renderDeleteButton(message)}
               <div className="flex-1"></div>
             </li>
             : <li key={message.id} className="relative flex flex-row">
@@ -477,34 +486,43 @@
       </div>
     }
 
-    function Submit({ room, uuid, fallback = '' }) {
+    function Submit({ uuid, room, setMessages }) {
 
-      const [content, setContent] = React.useState(fallback)
-      const resetForm = (content) => setContent(content)
+      const [content, setContent] = React.useState()
+      const resetForm = () => setContent(null)
 
-      const createMessage = async (content) => {
+      const submitMessage = async (pushState, filterState, updateState) => {
 
-        if (content) {
-          const { data, error } = await client.from('messages')
-            .insert({ content, room_id: room, user_id: uuid })
+        const message = { id: uuidv4(), content, room_id: room.id, user_id: uuid }
 
-          if (error) {
-            switch (error.code) {
-              case '23502':
-              case '23503':
-                // user_id bad value
-                // return signOut()
-                break;
-              default:
-                return content
-                break;
-            }
-          }
-
-          return fallback
+        if (pushState) {
+          pushState(message)
         }
 
-        return fallback
+        return
+
+        const { data, error } = await client.from('messages')
+          .insert(message)
+
+        if (error) {
+          switch (error.code) {
+            // user_id bad value
+            case '23502':
+            case '23503':
+              // return signOut()
+              break;
+            default:
+              if (filterState) {
+                filterState(message)
+              }
+              break;
+          }
+        }
+
+        if (updateState) {
+          updateState(message, data)
+        }
+
       }
 
       const handleChange = (e, limit = 5, offset = 1) => {
@@ -521,10 +539,21 @@
       }
 
       const handleSubmit = async (e) => {
+
         e.preventDefault()
-        resetForm(
-          await createMessage(content)
+
+        submitMessage(
+          (message) => setMessages(
+            (messages) => [message, ...messages]
+          ),
+          (deleted) => setMessages(
+            (messages) => messages.filter((message) => message.id !== deleted.id)
+          ),
+          (updated, message) => setMessages(
+            (messages) => messages.map(u => u.id !== updated.id ? u : message)
+          )
         )
+        resetForm()
       }
 
       const handleCtrlEnter = async (e) => {
@@ -613,15 +642,15 @@
       </div>
     }
 
-    function Room({ id, room, setRoom }) {
+    function Room({ room, setRoom }) {
 
       //const [room, setRoom] = React.useState()
       const [loading, setLoading] = React.useState(true)
 
-      const fetchRoom = async (id, setState, setLoading) => {
+      const fetchRoom = async (setState, setLoading) => {
         const { data, error } = await client.from('rooms')
           .select('id, name, description, priest:priest(id, name, bio, avatar_url), ts')
-          .eq('id', id)
+          .eq('id', room.id)
           .single()
 
         if (setLoading) {
@@ -661,7 +690,10 @@
 
       React.useEffect(() => {
 
-        fetchRoom(id, (room) => setRoom(room), (loading) => setLoading(loading))
+        fetchRoom(
+          (room) => setRoom(room),
+          (loading) => setLoading(loading)
+        )
 
         return () => setLoading(true)
       }, [])
@@ -760,10 +792,13 @@
         setUuid(null)
       }
 
+      // https://iqpokkogrxcidfvvouaz.supabase.co/storage/v1/object/public/uploads/Lets%20Be%20Friends%20-%20FTW.mp3?t=2022-12-08T13%3A51%3A22.157Z
+
       return <Container>
-        <Room id={id} room={room} setRoom={setRoom} />
+        <Room room={room} setRoom={setRoom} />
         <Users room={room} users={users} setUsers={setUsers} />
         <Messages uuid={uuid} room={room} users={users} messages={messages} setMessages={setMessages} />
+        <Submit uuid={uuid} room={room} setMessages={setMessages} />
       </Container>
 
       return uuid
