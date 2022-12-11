@@ -1,16 +1,47 @@
+<style type="text/tailwindcss">
+  @layer base {
+    {{ site.tailwindcss.base }}
+    {{ page.tailwindcss.base }}
+  }
+  @layer utilites {
+    {{ site.tailwindcss.utilites }}
+    {{ page.tailwindcss.utilites }}
+  }
+  @layer components {
+    {{ site.tailwindcss.components }}
+    {{ page.tailwindcss.components }}
+  }
+</style>
+
 {% for package in site.unpkg %}
 <script src="{{ package }}" crossorigin></script>
 {% endfor %}
+
 {% for package in page.unpkg %}
 <script src="{{ package }}" crossorigin></script>
 {% endfor %}
+
+{% if site.head %}
+  {{ site.head }}
+{% endif %}
+
+{% if page.head %}
+  {{ page.head }}
+{% endif %}
+
+<style type="text/css">
+  {{ site.css }}
+  {{ page.css }}
+</style>
+
 {% if site.js %}
-<script>
+<script type="text/javascript">
   {{ site.js }}
 </script>
 {% endif %}
+
 {% if page.js %}
-<script>
+<script type="text/javascript">
   {{ page.js }}
 </script>
 {% endif %}

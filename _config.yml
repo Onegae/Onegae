@@ -1,6 +1,13 @@
 title: ~
 
+tailwindcss:
+  base: ~
+  utilites: ~
+  components: ~
+
 unpkg: ~
+head: ~
+css: ~
 js: ~
 
 titles_from_headings:
