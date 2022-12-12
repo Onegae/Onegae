@@ -242,8 +242,13 @@
       const videoMessage = /^https:\/\/[^\s]+\.(mp4|ogg)(\?[^\s]+)?$/i
       const embedMessage = /^https:\/\/(www\.youtube\.com\/watch\?v=)([^\s]+)$/i
       const proseMessage = /\n\n/gmui
+      const pgpMessage = /-----(BEGIN|END) PGP ([\sA-Z]+)-----/gmui
 
       const isMine = (message) => message.user_id === uuid
+
+      const isPGPMessage = (content) => {
+        return pgpMessage.test(content)
+      }
 
       const isProseMessage = (content) => {
         return proseMessage.test(content)
@@ -267,7 +272,8 @@
 
       const processEmbedMessage = (content, group = 2) => {
 
-        const src = 'https://www.youtube.com/embed/' + content.match(embedMessage).at(group)
+        const src = 'https://www.youtube.com/embed/' + content.match(embedMessage)
+          .at(group)
 
         return <div className="aspect-w-16 aspect-h-9">
           <iframe src={src} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
@@ -279,6 +285,15 @@
         const html = formatter.parse(content)
 
         return HTMLReactParser(html)
+      }
+
+      const processPGPMessage = (content) => {
+
+        const cropped = content.replaceAll(pgpMessage, '').trim()
+
+        return <div className="overflow-hidden text-ellipsis blur-[2px]">
+          {cropped}
+        </div>
       }
 
       const processMessage = (content) => {
@@ -295,6 +310,9 @@
         const classNames = ['cursor-pointer max-w-xs md:max-w-md']
 
         switch (true) {
+          case isPGPMessage(message.content):
+            classNames.push('p-3', 'px-4', isMine(message) ? 'mb-2' : 'mb-6', 'rounded-lg', 'text-white', 'bg-slate-200', 'dark:bg-slate-800 dark:text-white/90')
+            break;
           case isImageMessage(message.content):
             classNames.push('p-0', isMine(message) ? 'mb-2' : 'mb-6', 'rounded-lg', 'overflow-hidden')
             break
@@ -343,6 +361,8 @@
       const renderMessage = (message) => {
 
         switch (true) {
+          case isPGPMessage(message.content):
+            return processPGPMessage(message.content)
           case isImageMessage(message.content):
             return <img src={message.content} />
           case isVideoMessage(message.content):
@@ -425,7 +445,7 @@
 
       React.useEffect(() => {
 
-        return () => {}
+        return () => { }
 
       }, [])
 

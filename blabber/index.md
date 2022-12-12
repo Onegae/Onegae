@@ -145,6 +145,12 @@ Array.from(
       )
     </script>
 
+
+    curl -X POST https://iqpokkogrxcidfvvouaz.supabase.co/rest/v1/messages \
+      -H 'Content-Type: application/json' \
+      -H 'ApiKey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxcG9ra29ncnhjaWRmdnZvdWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk1NjUyMDksImV4cCI6MTk4NTE0MTIwOX0.CqEo93msN9MeaCFrCVFtO8AorACl7Cm1rk3rTaGUgbA' \
+      -d '{"content":"Привет!","room_id":"2f47c09b-57f5-4494-adfa-2bec0aa391a6","user_id":"29ffbaf6-200e-4383-a024-23b795afee3b"}' 
+
 Реструктуризация
 ----------------
 
