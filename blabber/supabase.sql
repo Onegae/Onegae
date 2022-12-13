@@ -71,8 +71,9 @@ values
 -- Table
 create table if not exists messages (
   id uuid default uuid_generate_v4() primary key,
-  room_id uuid references rooms (id) on delete cascade not null,
-  user_id uuid references users (id) on delete cascade not null,
+  room_id uuid references rooms (id) on delete cascade null,
+  user_id uuid references users (id) on delete cascade null,
+  username text null,
   content text not null,
   ts timestamptz default now() not null
 );
