@@ -64,22 +64,6 @@ const women = ['Почему ты мне не поставил лайк?', 'Чт
 
 Источник: <https://mport.ua/mix/760788-50-tupyh-fraz-kotorye-proiznosit-kazhdaja-zhencshina>
 
-Цифровизация
-------------
-
-Голограмма бортового журнала:
-
-    -----BEGIN PGP PUBLIC KEY BLOCK-----
-
-    mDMEY4c73xYJKwYBBAHaRw8BAQdA9+N7jMkSKbXC2rC30g1XffuQObFgWngURgrB
-    P0vBsaO0K9CV0LLQs9C10L3QuNC5INCe0L3QtdCz0LjQvSA8b25lZ2FlQHZrLmNv
-    bT6IkAQTFggAOBYhBNxzn4U1qbMW3lF1co0VvHpuBXcbBQJjhzvfAhsDBQsJCAcC
-    BhUKCQgLAgQWAgMBAh4BAheAAAoJEI0VvHpuBXcbO8wA/1XYoqou1nJFqJJfQez4
-    DEAWOyd/XEvWWDNw9M5ILxP4AP0bkxefdALVglLkyigg2x0s6PGXwz2g6zBF8Zq6
-    ofuuDw==
-    =va7x
-    -----END PGP PUBLIC KEY BLOCK-----
-
 Реализация
 ----------
 
@@ -110,14 +94,26 @@ const women = ['Почему ты мне не поставил лайк?', 'Чт
 
 Новогодние подарки:
 
-- [ ] Фотогалерея путешествия
+- [x] Фотогалерея путешествия
 - [ ] Пределы Supabase и иных способов хранения
+
+Нетарифицируемые сервисы:
+
+    Up to 500MB database & 1GB file storage
+    Up to 2GB bandwidth
+    Up to 50MB file uploads
+    ...
+    50,000 monthly active users
+    Up to 500K Edge Function invocations
+
+Источник: <https://supabase.com/pricing>
+
 - [ ] Переписка Евгения Онегина с Татьяной
 - [x] Ключи от квартиры «где деньги лежат» и/или PGP-подписей
 - [ ] Обмолвиться с Анной Романовой о царских ароматах той поры
 - [x] Проза на HTML5 и JavaScript
 - [ ] Книга Евгения Онегина
-- [x] Свободный Wi-Fi <https://wifiqrcode.com/>
+- [x] Генератор Wi-Fi и QR-кодов <https://wifiqrcode.com/>
 
 Реструктуризация
 ----------------
@@ -127,5 +123,3 @@ const women = ['Почему ты мне не поставил лайк?', 'Чт
 Комната объединена со списком участников + поле ввода имени. (room+users)+signUp
 
 ref + lastMessageTimestamp
-
-лицензиянашрифт интер
