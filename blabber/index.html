@@ -16,6 +16,7 @@
   <script src="https://unpkg.com/babel-standalone@6/babel.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/openpgp@5.5.0/dist/openpgp.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/uuid@8/dist/umd/uuidv4.min.js"></script>
   <script src="https://unpkg.com/moment@2/min/moment.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-copy-to-clipboard@5/build/react-copy-to-clipboard.min.js"></script>
@@ -163,7 +164,7 @@
         console.log('С Наступающим! 🎅', count)
       }
 
-      const fetchMessages = async (setState, setTop, setLoading, limit = 30) => {
+      const fetchMessages = async (updateState, updateTop, setLoading, limit = 30) => {
 
         const { data, error } = await client.from('messages')
           .select('id, content, username, user_id, user:user_id(id, name, bio, avatar_url), ts')
@@ -182,12 +183,12 @@
           return error
         }
 
-        if (setState) {
-          setState(data)
+        if (updateState) {
+          updateState(data)
         }
 
-        if (setTop) {
-          setTop(top)
+        if (updateTop) {
+          updateTop(top)
         }
       }
 
@@ -237,11 +238,15 @@
       }
 
       React.useEffect(() => {
+
         fetchMessages(
-          (messages) => setMessages(messages),
-          (topMessage) => setTopMessage(topMessage),
+          (fetched) => setMessages(
+            (messages) => [...fetched, ...messages]
+          ),
+          (message) => setTopMessage(message),
           (loading) => setLoading(loading),
         )
+
         // subscribeMessages(
         //   (message) => setMessages(
         //     (messages) => [message, ...messages]
@@ -254,20 +259,21 @@
         //   )
         // )
 
-        document.addEventListener('visibilitychange', () => {
+        const checkUpdates = () => {
 
           if (document.hidden === true) {
             return
           }
 
-          console.log(messages, topMessage)
+          fetchCount()
+        }
 
-          fetchCount() //TODO: "Старое" состояние
+        document.addEventListener('visibilitychange', checkUpdates)
 
-        })
-
-        return () => { }
-      }, [])
+        return () => {
+          document.removeEventListener('visibilitychange', checkUpdates)
+        }
+      }, [topMessage])
 
       const emojiMessage = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])+$/
       const shortMessage = /^(\W|\d|\w){0,7}$/
@@ -326,7 +332,19 @@
 
         const cropped = content.replaceAll(pgpMessage, '').trim()
 
-        return <div className="overflow-hidden text-ellipsis blur-[2px]">
+        const decryptMessage = async () => {
+
+          const password = prompt('Введите пароль')
+
+          const { data: decrypted } = await openpgp.decrypt({
+            message: await openpgp.readMessage({ armoredMessage: content }),
+            passwords: [password],
+          })
+
+          alert(decrypted)
+        }
+
+        return <div onClick={() => decryptMessage()} className="overflow-hidden text-ellipsis blur-[2px]">
           {cropped}
         </div>
       }
