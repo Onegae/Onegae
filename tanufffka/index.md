@@ -122,4 +122,4 @@ const women = ['Почему ты мне не поставил лайк?', 'Чт
 
 Комната объединена со списком участников + поле ввода имени. (room+users)+signUp
 
-ref + lastMessageTimestamp
+ref + topMessage

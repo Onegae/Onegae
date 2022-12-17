@@ -16,3 +16,7 @@ group :jekyll_plugins do
     gem "jekyll-titles-from-headings"
     gem "jekyll-relative-links"
 end
+
+group :development do
+    gem "faraday-retry"
+end

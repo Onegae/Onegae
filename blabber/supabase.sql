@@ -139,3 +139,8 @@ values
   ('uploads', 'uploads', true) on conflict on constraint buckets_pkey do nothing;
 
 -- See https://supabase.com/docs/guides/storage#policy-examples for more details.
+
+--
+-- Procedures
+--
+-- Setup 'username' column

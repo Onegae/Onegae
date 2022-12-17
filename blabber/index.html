@@ -57,7 +57,7 @@
         }
 
         if (error) {
-          return data
+          return error
         }
 
         if (setState) {
@@ -144,34 +144,56 @@
       </div>
     }
 
-    function Messages({ uuid, room, users, messages, setMessages }) {
+    function Messages({ uuid, room, users, messages, setMessages, topMessage, setTopMessage }) {
 
       const [loading, setLoading] = React.useState(true)
 
-      const fetchMessages = async (setState, setLoading) => {
+      const fetchCount = async () => {
+
+        const { count, error } = await client.from('messages')
+          .select('*', { count: 'exact' })
+          .eq('room_id', room.id)
+          .gt('ts', topMessage.ts)
+          .order('ts', { ascending: false })
+
+        if (error) {
+          return error
+        }
+
+        console.log('С Наступающим! 🎅', count)
+      }
+
+      const fetchMessages = async (setState, setTop, setLoading, limit = 30) => {
 
         const { data, error } = await client.from('messages')
-          .select('id, content, user_id, user:user_id(id, name, bio, avatar_url), ts')
+          .select('id, content, username, user_id, user:user_id(id, name, bio, avatar_url), ts')
           .eq('room_id', room.id)
+          .gt('ts', topMessage.ts)
           .order('ts', { ascending: false })
-          .limit(30)
+          .limit(limit) //TODO: Возможность принять предыдущие сообщения
+
+        const [top,] = [...data, topMessage]
 
         if (setLoading) {
           setLoading(false)
         }
 
         if (error) {
-          return data
+          return error
         }
 
         if (setState) {
           setState(data)
         }
+
+        if (setTop) {
+          setTop(top)
+        }
       }
 
       const fetchMessage = async (id) => {
         const { data } = await client.from('messages')
-          .select('id, content, user_id, user:user_id(id, name, bio, avatar_url), ts')
+          .select('id, content, username, user_id, user:user_id(id, name, bio, avatar_url), ts')
           .eq('room_id', room.id)
           .eq('id', id)
           .single()
@@ -187,11 +209,11 @@
           .eq('id', id)
       }
 
-      const subscribeMessages = async (pushState, filterState, updateState) => {
+      const subscribeMessages = async (pushState, filterState, updateState /*, setTopMessage */) => {
 
         const subscription = await client.channel('public:messages')
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'room_id=eq.' + room.id }, async ({ new: message }) => {
-            //TODO: Проверка насуществования сообщения или рефактор
+            //TODO: Проверка на существование сообщения или рефакторинг
             if (isMine(message)) {
               updateState(
                 message, await fetchMessage(message.id)
@@ -214,24 +236,37 @@
           .subscribe()
       }
 
-      //const [messages, setMessages] = React.useState([])
-
       React.useEffect(() => {
         fetchMessages(
           (messages) => setMessages(messages),
-          (loading) => setLoading(loading)
+          (topMessage) => setTopMessage(topMessage),
+          (loading) => setLoading(loading),
         )
-        subscribeMessages(
-          (message) => setMessages(
-            (messages) => [message, ...messages]
-          ),
-          (deleted) => setMessages(
-            (messages) => messages.filter((message) => message.id !== deleted.id)
-          ),
-          (updated, message) => setMessages(
-            (messages) => messages.map(u => u.id !== updated.id ? u : message)
-          )
-        )
+        // subscribeMessages(
+        //   (message) => setMessages(
+        //     (messages) => [message, ...messages]
+        //   ),
+        //   (deleted) => setMessages(
+        //     (messages) => messages.filter((message) => message.id !== deleted.id)
+        //   ),
+        //   (updated, message) => setMessages(
+        //     (messages) => messages.map(u => u.id !== updated.id ? u : message)
+        //   )
+        // )
+
+        document.addEventListener('visibilitychange', () => {
+
+          if (document.hidden === true) {
+            return
+          }
+
+          console.log(messages, topMessage)
+
+          fetchCount() //TODO: "Старое" состояние
+
+        })
+
+        return () => { }
       }, [])
 
       const emojiMessage = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])+$/
@@ -629,7 +664,7 @@
         }
 
         if (error) {
-          return data
+          return error
         }
 
         if (setState) {
@@ -694,6 +729,7 @@
       const [room, setRoom] = React.useState({ id, priest: {} })
       const [users, setUsers] = React.useState([])
       const [messages, setMessages] = React.useState([])
+      const [topMessage, setTopMessage] = React.useState({ ts: '2022-11-23 06:38:00.000000+00' })
 
       // useSession
       const [uuid, setUuid] = React.useState(
@@ -768,7 +804,7 @@
       return <Container>
         <Room room={room} setRoom={setRoom} />
         <Users uuid={uuid} room={room} users={users} setUsers={setUsers} />
-        <Messages uuid={uuid} room={room} users={users} messages={messages} setMessages={setMessages} />
+        <Messages uuid={uuid} room={room} users={users} messages={messages} setMessages={setMessages} topMessage={topMessage} setTopMessage={setTopMessage} />
         <Submit uuid={uuid} room={room} setMessages={setMessages} />
       </Container>
 
