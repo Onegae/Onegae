@@ -12,29 +12,17 @@ js: |
 
   const first = setInterval(
     async () => {
+      const random = Math.floor(Math.random() * 50)
       const { data, error } = await client.from('messages')
         .insert({ 
-          content: women[
-            Math.floor(Math.random() * 50)
-          ], 
+          content: women[random], 
           room_id: room, 
           user_id: uuid
         })
         .select()
         .single()
-
-      setTimeout(
-        async () => {
-          const { error } = await client
-            .from('messages')
-            .delete()
-            .eq('room_id', room)
-            .eq('id', data.id)
-        },
-        10000
-      )
     }, 
-    15000
+    30000
   )
   
   const config = {
@@ -95,7 +83,7 @@ const women = ['Почему ты мне не поставил лайк?', 'Чт
 Новогодние подарки:
 
 - [x] Фотогалерея путешествия
-- [ ] Пределы Supabase и иных способов хранения
+- [x] Пределы Supabase и иных способов хранения
 
 Нетарифицируемые сервисы:
 
@@ -118,8 +106,7 @@ const women = ['Почему ты мне не поставил лайк?', 'Чт
 Реструктуризация
 ----------------
 
-Компоненты:
-
-Комната объединена со списком участников + поле ввода имени. (room+users)+signUp
-
-ref + topMessage
+- [ ] Комната объединена со списком участников + поле ввода имени. (room+users)+signUp
+- [ ] ref на поле ввода текста
+- [ ] отправка по CTRL+Enter
+- [ ] Анна Романова
