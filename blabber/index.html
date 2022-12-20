@@ -19,9 +19,11 @@
   <script src="https://unpkg.com/openpgp@5.5.0/dist/openpgp.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/uuid@8/dist/umd/uuidv4.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/moment@2/min/moment.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/react-copy-to-clipboard@5/build/react-copy-to-clipboard.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-copy-to-clipboard@5/build/react-copy-to-clipboard.min.js"
+    crossorigin="anonymous"></script>
   <script src="https://unpkg.com/marked@4.2.4/marked.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/html-react-parser@latest/dist/html-react-parser.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/html-react-parser@latest/dist/html-react-parser.min.js"
+    crossorigin="anonymous"></script>
   <script src="https://unpkg.com/localforage@latest/dist/localforage.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2" crossorigin="anonymous"></script>
   <style type="text/tailwindcss">
@@ -448,7 +450,7 @@
             : 'bg-slate-300 dark:bg-slate-700 dark:text-white')
 
         return <div className={classNames}>
-          {message.user.name}
+          {message.user ? message.user.name : message.username}
           <span className="absolute -right-0.5 -bottom-0.5 w-2 h-2 bg-emerald-300 rounded-full"></span>
         </div>
       }
@@ -481,9 +483,7 @@
               <div className="flex-1"></div>
             </li>
             : <li key={message.id} className="relative flex flex-row">
-              <CopyToClipboard text={message.content}>
-                <div className={buildClasses(message, uuid)}>{renderMessage(message)}</div>
-              </CopyToClipboard>
+              <div className={buildClasses(message, uuid)}>{renderMessage(message)}</div>
               {renderUser(message)}
               {renderTime(message)}
               <div className="flex-1"></div>
