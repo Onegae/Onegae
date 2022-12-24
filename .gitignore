@@ -2,4 +2,3 @@
 .jekyll-cache/
 *.lock
 _site/
-node_modules/
