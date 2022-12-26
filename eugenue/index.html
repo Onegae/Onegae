@@ -17,14 +17,14 @@
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/openpgp@5.5.0/dist/openpgp.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/uuid@8/dist/umd/uuidv4.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/moment@2/min/moment.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/react-copy-to-clipboard@5/build/react-copy-to-clipboard.min.js"
+  <script src="https://unpkg.com/uuid@8.3.2/dist/umd/uuidv4.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/moment@2.29.4/min/moment.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-copy-to-clipboard@5.1.0/build/react-copy-to-clipboard.min.js"
     crossorigin="anonymous"></script>
   <script src="https://unpkg.com/marked@4.2.4/marked.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/html-react-parser@latest/dist/html-react-parser.min.js"
+  <script src="https://unpkg.com/html-react-parser@3.0.4/dist/html-react-parser.min.js"
     crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/localforage@latest/dist/localforage.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/localforage@1.10.0/dist/localforage.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 </head>
 
@@ -281,7 +281,7 @@
       const proseMessage = /\n\n/gmui
       const pgpMessage = /-----(BEGIN|END) PGP ([\sA-Z]+)-----/gmui
 
-      const isMine = (message) => message.user_id === uuid
+      const isMine = (message) => message.user === null || message.user_id === uuid
 
       const isPGPMessage = (content) => {
         return pgpMessage.test(content)
@@ -437,10 +437,15 @@
 
       const renderUser = (message) => {
 
-        const classNames = 'absolute bottom-3 left-3 cursor-default w-max text-xs p-0.5 px-1.5 -mx-1 rounded-full font-medium text-slate-900 '
-          + (message.user.id === room.priest.id
+        let classNames = 'absolute bottom-3 left-3 cursor-default w-max text-xs p-0.5 px-1.5 -mx-1 rounded-full font-medium text-slate-900 '
+
+        if (message.user) {
+          classNames = classNames.concat(message.user.id === room.priest.id
             ? 'bg-gradient-to-r from-red-200 via-red-300 to-yellow-200'
             : 'bg-slate-300 dark:bg-slate-700 dark:text-white')
+        } else {
+          classNames = classNames.concat('bg-slate-300 dark:bg-slate-700 dark:text-white')
+        }
 
         return <div className={classNames}>
           {message.user ? message.user.name : message.username}
