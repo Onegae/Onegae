@@ -1,6 +1,8 @@
 title: Евгений Онегин
 description: Вымышленный персонаж. Татьяне написал.
 
+theme: ~
+
 tailwindcss:
   base: ~
   utilites: ~
